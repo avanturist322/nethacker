@@ -15,27 +15,25 @@ def is_monster_faster(agent, monster):
 
 
 def imminent_death_on_melee(agent, monster):
+    # hypothesis: many training deaths are to nominally "trivial" monsters (kobolds,
+    # kittens, geckos, giant rats, giant bats, foxes) that never trip the retreat/avoid
+    # logic because it only kicks in for the small is_dangerous_monster() list, or once
+    # HP is already critically low (<=8). A single unlucky hit at hp=9..12 can then kill
+    # outright. Raising the generic (non-"dangerous") retreat threshold from 8 to 12 gives
+    # a bit more buffer against any monster's bad damage roll, not just the flagged ones.
     if is_dangerous_monster(monster):
         return agent.blstats.hitpoints <= 16
-    return agent.blstats.hitpoints <= 8
+    return agent.blstats.hitpoints <= 12
 
 
 def is_dangerous_monster(monster):
     _, y, x, mon, _ = monster
     is_pet = 'dog' in mon.mname or 'cat' in mon.mname or 'kitten' in mon.mname or 'pony' in mon.mname \
              or 'horse' in mon.mname
-    # hypothesis: this list of genuinely hard-hitting early monsters was present but disabled, so
-    # is_dangerous_monster() only ever flagged pets/insects. That meant the retreat threshold in
-    # imminent_death_on_melee() (hp<=16 for "dangerous" monsters vs hp<=8 otherwise) and the extra
-    # caution added in elbereth_action()/get_potential_wand_usages() never kicked in for monsters
-    # like mumaks, rothes, orcs, weres, elves, leocrottas and mimics -- exactly the monster types
-    # this bot's training runs were dying to (e.g. "killed by a mumak", "killed by a rothe"). Turning
-    # this list back on should make the bot retreat/engrave/use wands earlier against these threats
-    # instead of melee-ing them down to death like a trivial monster.
-    is_dangerous = 'mumak' in mon.mname or 'orc' in mon.mname or 'rothe' in mon.mname \
-        or 'were' in mon.mname or 'unicorn' in mon.mname or 'elf' in mon.mname or 'leocrotta' in mon.mname \
-        or 'mimic' in mon.mname
-    return is_pet or is_dangerous or mon.mname in INSECTS
+    # 'mumak' in mon.mname or 'orc' in mon.mname or 'rothe' in mon.mname \
+    # or 'were' in mon.mname or 'unicorn' in mon.mname or 'elf' in mon.mname or 'leocrotta' in mon.mname \
+    # or 'mimic' in mon.mname
+    return is_pet or mon.mname in INSECTS
 
 
 def consider_melee_only_ranged_if_hp_full(agent, monster):
