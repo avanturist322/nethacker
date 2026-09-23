@@ -1,16 +1,5 @@
-from .utils import wielding_melee_weapon
-
 # heuristic monster types lists
-# hypothesis: fighting a cockatrice/chickatrice barehanded (not wielding a
-# weapon) risks instant petrification on a successful hit, same as touching its
-# corpse -- one of this bot's training deaths was exactly this ("petrified by a
-# cockatrice corpse"). Wielding a weapon avoids that risk entirely, so unlike
-# the other ONLY_RANGED_SLOW_MONSTERS (which should basically never be meleed),
-# cockatrices only need to be added here to gate the *unarmed* case; see
-# consider_melee_only_ranged_if_hp_full below, which allows melee whenever a
-# weapon is wielded so an armed character keeps fighting them normally.
-ONLY_RANGED_SLOW_MONSTERS = ['floating eye', 'blue jelly', 'brown mold', 'gas spore', 'acid blob',
-                              'cockatrice', 'chickatrice']
+ONLY_RANGED_SLOW_MONSTERS = ['floating eye', 'blue jelly', 'brown mold', 'gas spore', 'acid blob']
 EXPLODING_MONSTERS = ['yellow light', 'gas spore', 'flaming sphere', 'freezing sphere', 'shocking sphere']
 INSECTS = ['giant ant', 'killer bee', 'soldier ant', 'fire ant', 'giant beetle', 'queen bee']
 WEAK_MONSTERS = ['lichen', 'newt', 'shrieker', 'grid bug']
@@ -42,8 +31,4 @@ def is_dangerous_monster(monster):
 
 
 def consider_melee_only_ranged_if_hp_full(agent, monster):
-    if monster[3].mname in ('cockatrice', 'chickatrice'):
-        # safe to melee while wielding a weapon: petrification only comes from
-        # touching it with bare hands, not from a weapon strike
-        return wielding_melee_weapon(agent)
     return monster[3].mname in ('brown mold', 'blue jelly') and agent.blstats.hitpoints == agent.blstats.max_hitpoints

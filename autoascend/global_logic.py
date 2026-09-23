@@ -515,7 +515,16 @@ class GlobalLogic:
         while 1:
             explore_stairs_condition = lambda: False
             if self.milestone == Milestone.BE_ON_FIRST_LEVEL:
-                condition = lambda: self.agent.blstats.experience_level >= 8
+                # hypothesis: this bot's training deaths are dominated by being
+                # underleveled for the monsters it meets once it starts
+                # descending (rothes, soldier ants, quasits, elves, unicorns
+                # killing it shortly after leaving dlvl1). Raising how much
+                # experience it banks on dlvl1 (relatively safe, well-scouted
+                # ground) before diving to XL10 should mean it enters the mines
+                # /deeper dungeon with more HP and better to-hit/damage,
+                # surviving the first dangerous encounters there instead of
+                # dying almost immediately after descending.
+                condition = lambda: self.agent.blstats.experience_level >= 10
                 # explore_stairs_condition = lambda: self.agent.inventory.items.total_nutrition() == 0 and \
                 #                                    self.agent.blstats.hunger_state >= Hunger.NOT_HUNGRY
                 level = (Level.DUNGEONS_OF_DOOM, 1)
