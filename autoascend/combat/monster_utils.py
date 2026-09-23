@@ -33,7 +33,16 @@ def is_dangerous_monster(monster):
     # 'mumak' in mon.mname or 'orc' in mon.mname or 'rothe' in mon.mname \
     # or 'were' in mon.mname or 'unicorn' in mon.mname or 'elf' in mon.mname or 'leocrotta' in mon.mname \
     # or 'mimic' in mon.mname
-    return is_pet or mon.mname in INSECTS
+    # hypothesis: an angered shopkeeper is a well-known outlier threat in early NetHack --
+    # far harder-hitting than its dungeon level suggests, and (unlike most monsters)
+    # unaffected by Elbereth -- but it wasn't flagged dangerous, so it only ever got the
+    # generic hp<=12 retreat threshold like a kobold (recorded training death: "killed by
+    # ... the shopkeeper" at Xp:10). A wider list of "merely tough" monsters (orcs/rothes/
+    # elves/unicorns) was tried and made things worse, likely because they're common enough
+    # that constant retreating from them wastes too much time; shopkeepers are rare enough
+    # that giving them the higher hp<=16 buffer shouldn't have that same cost.
+    is_shopkeeper = 'shopkeeper' in mon.mname
+    return is_pet or is_shopkeeper or mon.mname in INSECTS
 
 
 def consider_melee_only_ranged_if_hp_full(agent, monster):
