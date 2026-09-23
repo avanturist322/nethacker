@@ -525,8 +525,15 @@ class GlobalLogic:
                 # surviving the first dangerous encounters there instead of
                 # dying almost immediately after descending.
                 condition = lambda: self.agent.blstats.experience_level >= 10
-                # explore_stairs_condition = lambda: self.agent.inventory.items.total_nutrition() == 0 and \
-                #                                    self.agent.blstats.hunger_state >= Hunger.NOT_HUNGRY
+                # hypothesis: banking XP on dlvl1 up to XL10 (see above) can starve
+                # the bot when the level's food supply runs dry before it gets there
+                # (2/15 training deaths were "died of starvation", all stuck on
+                # dlvl1 at low XL). Re-enabling this previously-disabled safety
+                # valve makes the bot head for the stairs down once it has no
+                # more carried food and is at least NOT_HUNGRY, so it can find
+                # fresh food/levels instead of grinding a depleted level to death.
+                explore_stairs_condition = lambda: self.agent.inventory.items.total_nutrition() == 0 and \
+                                                   self.agent.blstats.hunger_state >= Hunger.NOT_HUNGRY
                 level = (Level.DUNGEONS_OF_DOOM, 1)
 
             elif self.milestone == Milestone.FIND_SOKOBAN:
