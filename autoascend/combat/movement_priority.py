@@ -61,11 +61,6 @@ def draw_monster_priority_positive(agent, monster, priority, walkable):
             _draw_around(priority, y, x, 1, radius=2, operation='max')
         if len(agent.inventory.get_ranged_combinations()):
             _draw_ranged(priority, y, x, 1, walkable, radius=7, operation='max')
-    elif 'unicorn' in mon.mname:
-        if agent.blstats.hitpoints >= 15 or agent.blstats.hitpoints == agent.blstats.max_hitpoints:
-            # freely engage in melee
-            _draw_around(priority, y, x, 2, radius=1, operation='max')
-            _draw_around(priority, y, x, 1, radius=2, operation='max')
     else:
         if not imminent_death_on_melee(agent, monster) and not utils.wielding_ranged_weapon(agent):
             # engage, but ensure striking first if possible
@@ -123,8 +118,6 @@ def draw_monster_priority_negative(agent, monster, priority, walkable):
             _draw_ranged(priority, y, x, 6, walkable, radius=7)
     elif mon.mname in ONLY_RANGED_SLOW_MONSTERS:  # and agent.inventory.get_ranged_combinations():
         # ignore
-        pass
-    elif 'unicorn' in mon.mname:
         pass
     else:
         if mon.mname not in WEAK_MONSTERS:

@@ -25,9 +25,16 @@ def is_dangerous_monster(monster):
     is_pet = 'dog' in mon.mname or 'cat' in mon.mname or 'kitten' in mon.mname or 'pony' in mon.mname \
              or 'horse' in mon.mname
     # 'mumak' in mon.mname or 'orc' in mon.mname or 'rothe' in mon.mname \
-    # or 'were' in mon.mname or 'unicorn' in mon.mname or 'elf' in mon.mname or 'leocrotta' in mon.mname \
+    # or 'were' in mon.mname or 'elf' in mon.mname or 'leocrotta' in mon.mname \
     # or 'mimic' in mon.mname
-    return is_pet or mon.mname in INSECTS
+    # hypothesis: hostile unicorns (2x gore + kick, up to ~30 dmg/turn) are one of the
+    # deadliest early-game monsters this character repeatedly dies to ("killed by a white
+    # unicorn" recurs across multiple training seeds/variants), yet movement_priority.py
+    # special-cases unicorns to be freely meleed whenever hp>=15 or at full hp, bypassing
+    # all danger avoidance. Flagging them here raises their imminent-death retreat
+    # threshold from <=8 to <=16 hp, same as other recognized dangerous monsters.
+    is_unicorn = 'unicorn' in mon.mname
+    return is_pet or is_unicorn or mon.mname in INSECTS
 
 
 def consider_melee_only_ranged_if_hp_full(agent, monster):
