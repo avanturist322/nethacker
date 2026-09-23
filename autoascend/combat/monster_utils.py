@@ -15,15 +15,9 @@ def is_monster_faster(agent, monster):
 
 
 def imminent_death_on_melee(agent, monster):
-    # hypothesis: many training deaths are to nominally "trivial" monsters (kobolds,
-    # kittens, geckos, giant rats, giant bats, foxes) that never trip the retreat/avoid
-    # logic because it only kicks in for the small is_dangerous_monster() list, or once
-    # HP is already critically low (<=8). A single unlucky hit at hp=9..12 can then kill
-    # outright. Raising the generic (non-"dangerous") retreat threshold from 8 to 12 gives
-    # a bit more buffer against any monster's bad damage roll, not just the flagged ones.
     if is_dangerous_monster(monster):
         return agent.blstats.hitpoints <= 16
-    return agent.blstats.hitpoints <= 12
+    return agent.blstats.hitpoints <= 8
 
 
 def is_dangerous_monster(monster):

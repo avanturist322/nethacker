@@ -229,7 +229,16 @@ def elbereth_action(agent, monsters):
             adj_monsters_count += 2 * multiplier
 
     player_hp_ratio = (agent.blstats.hitpoints / agent.blstats.max_hitpoints) ** 0.5
-    if agent.blstats.hitpoints < 30 and adj_monsters_count > 0:
+    # hypothesis: the trigger below used a fixed "hitpoints < 30" cutoff, so as this
+    # character's max HP grows past the low teens/twenties (cavalier gnome reaches
+    # 40-60+ max HP by XL9-10), Elbereth stops kicking in until HP has already fallen to
+    # a small fraction of the pool -- often one bad hit from a hard-hitting but
+    # non-flagged-"dangerous" monster (rothe, orc, mumak: several recorded training
+    # deaths) away from death. Also triggering once HP drops below 50% of max makes the
+    # defense scale with the character instead of going stale as it levels up, while
+    # keeping the old absolute cutoff so early-game (low max HP) behavior is unchanged.
+    if (agent.blstats.hitpoints < 30 or
+            agent.blstats.hitpoints < 0.5 * agent.blstats.max_hitpoints) and adj_monsters_count > 0:
         return [(-15 + 20 * adj_monsters_count * (1 - player_hp_ratio), ('elbereth',))]
     return []
 
