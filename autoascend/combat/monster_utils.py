@@ -24,10 +24,18 @@ def is_dangerous_monster(monster):
     _, y, x, mon, _ = monster
     is_pet = 'dog' in mon.mname or 'cat' in mon.mname or 'kitten' in mon.mname or 'pony' in mon.mname \
              or 'horse' in mon.mname
-    # 'mumak' in mon.mname or 'orc' in mon.mname or 'rothe' in mon.mname \
-    # or 'were' in mon.mname or 'unicorn' in mon.mname or 'elf' in mon.mname or 'leocrotta' in mon.mname \
-    # or 'mimic' in mon.mname
-    return is_pet or mon.mname in INSECTS
+    # hypothesis: this list of genuinely hard-hitting early monsters was present but disabled, so
+    # is_dangerous_monster() only ever flagged pets/insects. That meant the retreat threshold in
+    # imminent_death_on_melee() (hp<=16 for "dangerous" monsters vs hp<=8 otherwise) and the extra
+    # caution added in elbereth_action()/get_potential_wand_usages() never kicked in for monsters
+    # like mumaks, rothes, orcs, weres, elves, leocrottas and mimics -- exactly the monster types
+    # this bot's training runs were dying to (e.g. "killed by a mumak", "killed by a rothe"). Turning
+    # this list back on should make the bot retreat/engrave/use wands earlier against these threats
+    # instead of melee-ing them down to death like a trivial monster.
+    is_dangerous = 'mumak' in mon.mname or 'orc' in mon.mname or 'rothe' in mon.mname \
+        or 'were' in mon.mname or 'unicorn' in mon.mname or 'elf' in mon.mname or 'leocrotta' in mon.mname \
+        or 'mimic' in mon.mname
+    return is_pet or is_dangerous or mon.mname in INSECTS
 
 
 def consider_melee_only_ranged_if_hp_full(agent, monster):
